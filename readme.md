@@ -4,15 +4,37 @@ Exercise 1 : Hello World
 Your terminal and you
 ---------------------
 
-Opening a terminal window
-    mkdir, cd, ls, cp, rm, mv
-    wildcards `*`
-    copy-paste
-        Ctrl is used for "signals"
-Compilers for C
+### Opening a terminal window
+There are seveal ways to open a new terminal window:
+ - [check Ubuntu menu]
+ - Press `Ctrl + Alt + T`
+
+From the terminal we can much more than with the graphical interface, but we will start with some basic and familiar functions. First, we should make a new folder that we will use as our "workbench" of sorts.
+
+ - To make this folder on the desktop, we must first change directory in the terminal. Do this by typing `cd ~/Desktop` ("cd" means "change directory"). Use the Tab key to autocomplete the directory name.
+ - Make a new directory using `mkdir directoryName`. Give this some appropriate name.
+
+We can create new files using `touch fileName`, and edit them using - for example - `nano` or `vi`. There are of course other non-terminal text editors, and these may be more (or less) comfortable to work with. Create a file.
+
+ - We can list the files in the current directory by using `ls` ("ls" means "list").
+   - If you call `ls -a`, you will see two extra entries: `.` and `..`. These are the "names" of the current directory and the parent directory, respectively. You can `cd` a level "up" by calling `cd ..`.
+ - We can move a file using `mv moveThisFile toHere`. Move the file you created one level up, by calling `mv fileYouCreated ../fileName`, or the shorter version `mv fileYouCreated ../` if you want to keep the same fileName.
+   - Call `ls ..` to check that the file is moved.
+ - Similarly to `mv`, we also have `cp` for copying.
+ - We can remove files using `rm`. Remove the file you created, moved (and any copies you created if you also copied it).
+
+`mv`, `cp` and `rm` all have their own set of options. You can see what these are by calling eg `rm --help`. For `cp` and `rm`, we see that we need to use the option `-r` or `--recursive` to copy or remove folders.
+
+If we want to select multiple files that match a certain pattern, we can use the wildcard `*`. For example, if we want to remove all files that end in `.txt`, we can call rm `*.txt`.
+    
+    
+In the terminal, Ctrl-C and Ctrl-V do not perform copy/paste, and you can find a brief history as to why [here](http://superuser.com/a/421468). Instead, use `Ctrl + Shift + [C/V/X]`
+
+
+###Compilers for C
     gcc, clang
         -Wall, -o
-Running programs
+###Running programs
     `./`
 
 
