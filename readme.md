@@ -1,10 +1,11 @@
-Exercise 1 : Hello World
-========================
+Intro to C and Linux
+====================
 
-Your terminal and you
----------------------
+Part 1: Your terminal and you
+-----------------------------
 
 ### Opening a terminal window
+
 There are seveal ways to open a new terminal window:
  - [check Ubuntu menu]
  - Press `Ctrl + Alt + T`
@@ -31,15 +32,36 @@ If we want to select multiple files that match a certain pattern, we can use the
 In the terminal, Ctrl-C and Ctrl-V do not perform copy/paste, and you can find a brief history as to why [here](http://superuser.com/a/421468). Instead, use `Ctrl + Shift + [C/V/X]`
 
 
+
+Part 2: Ready, Set, C
+---------------------
+
+Before we create our first program in C, we must first look into exactly how we create it, how we run it, and finally - if it doesn't do this on its own - how we make it stop.
+
 ###Compilers for C
-    gcc, clang
-        -Wall, -o
+
+To create an executable program from C-code, we must compile it. There are several C-compilers out there, and the most common is by far Gnu Compiler Collection, [gcc](https://gcc.gnu.org/). [Clang](http://clang.llvm.org/) is a newer compiler, which means it has taken several lessons learned from gcc. One of the most noticeable improvements are the significantly superior warnings and error messages.
+
+Compilers are complicated beasts, and have a [huge number of options](https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html). Here's a summary of the ones we will need:
+ - `-o executableName`: By default, the name of the executable is `a.out`. `-o` gives it a different name.
+ - `-c`: The compiler produces an object-file (.o) for each c-file, instead of a single executable.
+   - This is used to prevent compiling all of the code over and over, when only a few files have been changed.
+   - To create an executable from object files, use gcc or clang again, or call the linker directly using `ld`.
+ - `-Wall`: There are lots of `-Wxx` options for controlling warnings. `-Wall` enables all of them.
+   - In general, do not ignore compiler warnings because they're "just warnings"!
+ - `-g`: Produces debugging information that will be useful if (also known as "when") your programs crash.
+ - `-fsanitize=address`: This option will crash your program the moment Something Bad happenes with the memory the program is using, and print out a large amout of information about exactly what went wrong and - when used in combination with `-g` - where it happened.
+ 
 ###Running programs
-    `./`
 
+To tell the terminal that we want to run a program, we must prefix the name of the executable with `./`, eg `./totallyRadProgram`. You can find an explanation of why [here](http://askubuntu.com/a/320657).
 
-Goodbye world
--------------
+###Stopping program
+
+As you may recall if you read the explanation for why copy/paste is done with Ctrl-Shift-C/V, Ctrl-C is used to cancel the current program.
+
+Part 3: Hello World
+-------------------
 
 1: The standard hello world
     main function
