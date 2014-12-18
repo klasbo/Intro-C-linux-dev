@@ -137,7 +137,7 @@ You would think a program couldn't get smaller and more useless than this, but i
 
 The error message tells us that there is a problem in function `_start`: An undefined reference to `main`. As alluded to earlier, `main` isn't really where execution starts. There are several functions that are called before `main` (and we can even define our own), but `_start` is king of all functions.
 
-The problem is that `_start` tries to call `main`, but the compiler hasn't given the linker a function with that name. So to create an executable without main, we need to bypass `_start`. To do this, we will call the linker directly!
+The problem is that the automatically generated `_start` function tries to call `main`, but the compiler hasn't given the linker a function with that name. So to create an executable without main, we need to prevent the C compiler from creating a standard `_start` function. To do this, we will compile and link in two separate phases.
 
  - [ ] First, we must generate a file to give to the linker. Since the linker works with object files, we will compile our empty file with the compiler option `-c`.
  - [ ] Invoke the linker with `ld`, and pass the object file. You can give a name to the executable using `-o` as before.
@@ -149,15 +149,26 @@ The words "Segmentation Fault" means that the operating system prevented you fro
 Part 4: C syntax and some simple programs
 -----------------------------------------
 
-1: Basic types
+###1: Basic types
+
+[Basic types & modifiers from Sverre?]
+
     int, double, char, void (more?)
-1a: Modifiers
-    *, static, const
+    [], *, static, extern, const
     
-2: printf
-    format string, comma-separated arg list
-     
-3: Operators
+###2: `printf`
+
+`printf` takes one or more arguments, and the first argument is always a string (more specifically, a `char *`). In this string we can embed several *conversion specifiers* that will be replaced by the additional arguments. A conversion specifier starts with the character `%`:
+```C
+printf("An integer: %d, a string: %s\n", 5, "hello!");
+```
+
+You can find full documentation of printf by typing `man fprintf` in the terminal. However, going [here](http://www.cplusplus.com/reference/cstdio/printf/) provides a more concise overview with better examples.
+
+###3: Operators
+
+[From Sverre? Resources on the web?]
+
     Arithmetic:
         Binary: + - * / % 
         Unary: ++ -- 
