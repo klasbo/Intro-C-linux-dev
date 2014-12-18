@@ -60,28 +60,35 @@ int main(){
 
     // Arrays need to have a size known at compile-time
     int arr1[3];
+    
     // The compiler can also deduce the array size from the initializer list:
     int arr2[] = {1, 5, 3, 0, 7, 3};
+    
     // But after compiling, the size information is lost.
     // We need to pass the size of the array wherever we use it
+    // If the size is wrong, Bad Things can happen.
+    //  Try giving printArray a size that is too large! Also, compile with -fsanitize=address
     printArray(arr2, 3);
-    // Fortunately, we can get the compile-time constants like so:
+    
+    // Fortunately, we can access compile-time constants like so:
     //  sizeof(arr2) gives the total memory usage of the array
     //  sizeof(arr2[0]) gives the memory usage of a single element
     printArray(arr2, sizeof(arr2)/sizeof(arr2[0]));
+    
     // To make this easier, we define this function-like macro:
     //  (Macros perform text-substitution before the source is compiled)
-    #define sz(arr) sizeof(arr)/sizeof(arr[0])
+    #define len(arr) (sizeof(arr)/sizeof(arr[0]))
+    
     // If we do not assign any content to the array, it is fulled with junk:
-    printArray(arr1, sz(arr1));
+    printArray(arr1, len(arr1));
     
     
     
-    printf("Sum: %d\n", sum(arr2, sz(arr2)));
+    printf("Sum: %d\n", sum(arr2, len(arr2)));
     
-    qsort(arr2, sz(arr2), sizeof(arr2[0]), &compareInt);
+    qsort(arr2, len(arr2), sizeof(arr2[0]), &compareInt);
     
-    printArray(arr2, sz(arr2));
+    printArray(arr2, len(arr2));
 }
 
 
