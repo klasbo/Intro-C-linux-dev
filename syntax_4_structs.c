@@ -17,11 +17,16 @@ struct Card {
 Card fakeMagicTrick_byValue(Card c){
     Card result = {hearts, c.value};
     return result;
-    /* Alternatives:
+    
+    /// Alternatives:
+    
     // "Compound Literal"
+    /*
     return (Card){hearts, c.value};
+    */
     
     // "Designated initializer"
+    /*
     return (Card){
         .value = c.value;
         .suit = hearts
@@ -31,8 +36,10 @@ Card fakeMagicTrick_byValue(Card c){
 
 void fakeMagicTrick_byReference(Card* c){
     c->suit = hearts;
-    /* Alternative:
+    
+    /// Alternative:
     // The above is "syntactic sugar" for this:
+    /*
     (*c).suit = hearts;
     */
 }
