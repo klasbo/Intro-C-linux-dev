@@ -33,7 +33,7 @@ In the terminal, Ctrl-C and Ctrl-V do not perform copy/paste, and you can find a
 
 
 
-Part 2: Ready, Set, C
+Part 2: Ready, set, C
 ---------------------
 
 Before we create our first program in C, we must first look into exactly how we create it, how we run it, and finally - if it doesn't do this on its own - how we make it stop.
@@ -70,8 +70,8 @@ Now that we know how the basics of using the terminal and invoking compilers, we
 
 ###1: The standard "hello world" program
  - [ ] Copy or type the stanard "[hello world](https://github.com/klasbo/Intro-C-linux-dev/blob/master/hello_world.c) program. Compile it and run it, and verify that it works as expected.
- - 
- A function is declared as follows:
+
+A function is declared as follows:
 ```C
 return_type function_name(argument_type argument_name){
     // function body
@@ -104,35 +104,49 @@ To see what our source code looks like after the preprocessor has done its work,
 Back to what happenes when we remove the #include-directive: The problem is that the compiler has no way of knowing what the function `printf` looks like. We can help the compiler out by providing this definition ourselves.
  - [ ] Provide a definition of `printf`:
    - A function definition looks similar to a function declaration, but without the function body, eg: `return_type function_name(arg1_type, arg2_type);`. Note the semicolon. Giving names to the arguments is optional in a function definition.
-   - The output from clang is helpful enough to give us the return type and argument types. `...` is also a valid argument: It means that the function takes any number of additional arguments, and that their types are unknown.
+   - The output from clang is helpful enough to give us the return type and argument types. `...` is also a valid argument: It means that the function takes any number of *additional* arguments, and that their types are unknown.
         
-So why did the program compile and run even if the compiler didn't know what `printf` looks like? As it turns out, in C the "default" type of a function (one that is not defined) is `int function(...)`: A function that takes any arguments and returns an integer. Since `printf` happenes to be such a function, this technically "works fine".
+So why did the program compile and run even if the compiler didn't know what `printf` looks like? As it turns out, in C the "default" type of a function (one that is not defined) is `int function()`: A function that takes any number of arguments and returns an integer. Since `printf` happenes to be such a function, this technically "works fine".
 
 
-        
-3: With no return value
-    [!] language standards: c89, c99 (gnu99), c11
-        in c89, return statement was mandatory
-    using gcc c89:
-        get return value with `echo $?`
-        [?] what does it return?
-            hint: what does printf return?
-            [!] explanation of stack
-            
-4: The smallest C program?
-    Same as before: default function is `int fcn(...)`
-    
+###3: With no return value
 
-#5: The empty file
-#    [!] Linker: Undefined reference
-#    [!] Separate compile and link phase
-#        [?] use -c
-#        [?] link with ld, and define `--entry main`
-#
+C is an old language, and so there exists several standards: c89, c99, and the most recent: c11. In c89, the return statement at the end of `main` was mandatory, but this was lifted in c99, where a program returns 0 unless specified otherwise.
+
+ - [ ] We can get the return value of the program that last ran by typing `echo $?` in the terminal. Change the return value of the program, run it, and verify that you get the correct value from `echo $?`.
+ - [ ] Remove the `return` statement, and ~~go back in time to 1989~~ compile with the option `-std=c89` using gcc (clang has poor support for old versions of C). Run the program and check the return value. What do you get?
+   - Do you see any place in the code that corresponds to the return value of the program?
+   - Hint (Spoilers): Try modifying the printed message to something else, like "Penguins!".
+
+[Explanation of stack from Sverre?]
+[Trailing zeros in strings from Sverre?]
+
+###4: The smallest C program?
+
+Let's keep removing things! The first to go is `printf`.
+
+Remember the "default" function type? This also goes for `main`: It takes an unknown number of arguments, and returns an integer. This means we can remove the `void` argument, and also the return type.
+ - [ ] Compile this "program" and run it. Wasn't that exciting?
+
+###5: Definitely the smallest C program.
+
+You would think a program couldn't get smaller and more useless than this, but it can.
+
+ - [ ] Delete everything in the entire file, and try compiling it.
+
+The error message tells us that there is a problem in function `_start`: An undefined reference to `main`. As alluded to earlier, `main` isn't really where execution starts. There are several functions that are called before `main` (and we can even define our own), but `_start` is king of all functions.
+
+The problem is that `_start` tries to call `main`, but the compiler hasn't given the linker a function with that name. So to create an executable without main, we need to bypass `_start`. To do this, we will call the linker directly!
+
+ - [ ] First, we must generate a file to give to the linker. Since the linker works with object files, we will compile our empty file with the compiler option `-c`.
+ - [ ] Invoke the linker with `ld`, and pass the object file. You can give a name to the executable using `-o` as before.
+ - [ ] Run the worlds shortest C program!
+
+The words "Segmentation Fault" means that the operating system prevented you from accessing memory that your program doesn't own. In this case, the value of `_start` was not defined, so `ld` gave it a default value, one that happened to he outside the valid memory region of the program. Without an operating system, this program would have interpreted whatever happened to lie in this memory as valid machine code, and all hell would break loose.
+
     
-    
-Exercise 2 : Syntax
-===================
+Part 4: C syntax and some simple programs
+-----------------------------------------
 
 1: Basic types
     int, double, char, void (more?)
