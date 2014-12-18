@@ -51,6 +51,9 @@ Compilers are complicated beasts, and have a [huge number of options](https://gc
    - In general, do not ignore compiler warnings because they're "just warnings"!
  - `-g`: Produces debugging information that will be useful if (also known as "when") your programs crash.
  - `-fsanitize=address`: This option will crash your program the moment Something Bad happenes with the memory the program is using, and print out a large amout of information about exactly what went wrong and - when used in combination with `-g` - where it happened.
+
+We invoke the compiler using `compiler -options filename.c`, eg `gcc -Wall hello_world.c`.
+ 
  
 ###Running programs
 
@@ -63,21 +66,49 @@ As you may recall if you read the explanation for why copy/paste is done with Ct
 Part 3: Hello World
 -------------------
 
-1: The standard hello world
-    main function
-        returns int
-        optionally takes command line arguments (reading args later)
-    printf
-        newline
-        included from standard library
+Now that we know how the basics of using the terminal and invoking compilers, we can finally get started with some code. We will be doing something rather unconvetional here: Instead of working our way "up" towards a program that does something "useful", we will instead work our way "down". By looking at the standard "hello world" program line by line, we will break down (in more ways than one) a C program and the toolchain used for building an executable.
+
+###1: The standard "hello world" program
+ - [ ] Copy or type the stanard "[hello world](https://github.com/klasbo/Intro-C-linux-dev/blob/master/hello_world.c) program. Compile it and run it, and verify that it works as expected.
+ - 
+ A function is declared as follows:
+```C
+return_type function_name(argument_type argument_name){
+    // function body
+}
+```
+Note that C use braces (`{``}`) to signify the start and end of a scope, unlike - say- Python, which uses colon (`:`) and significant whitespace (indentation). [Familiar with scope concept?]
+
+ - The `main` function is where execution starts. (*This is a lie, We will come back to this later*)
+   - `main` must return an `int` (integer). Returning `0` is commonly used to signify that the program has run successfully.
+   - `main` can take either no arguments (here signified by `void`), or two arguments: `int main(int argc, char**argv)`. The latter two-argument version is used when the program should take arguments from the command line.
+ - `printf` is used to "print formatted" to the standard output (here the terminal). We will come back to the "formatted" part of printing later.
+   - The `\n` at the end of the string is used to print a newline. Try removing it to see what happenes.
+   - `printf` is a function, so we need to give the compiler some information about what this function looks like. We find this information in `stdio.h`, which is why we use `#include <stdio.h>`.
+ 
+   
+###2: Without #include
+
+Let us now see what happenes when we remove `#include <stdio.h>`:
+ - [ ] Remove the #include, and compile both with gcc and clang
+   - You will surely see a difference in the quality of the compiler output!
+ - [ ] Since the compiler gave us "just a warning", we can still run the program. Try running it.
+
+All lines that start with `#` are so-called "preprocessor directives". The preprocessor performs text manipulation before the compiler does its work, and has no understanding of what constitutes valid C-code. The `#include`-directive tells the preprocessor to scan the specified file before continuing with the rest of the file; it is essentialy a copy/paste operation. Other directives include `#define a b`, which replaces any instance of `a` with `b`. This may be useful for defining constants, eg `#define NUM_FLOORS 4`.
+
+To see what our source code looks like after the preprocessor has done its work, we use the compiler option `-E`.
+ - [ ] Put the #include-directive back, and invoke the compiler with `-E`.
+   - Yikes! That's a lot of stuff. `-E` is mostly useful when you need to see what your preprocessor directives output. [Some people](http://jhnet.co.uk/articles/cpp_magic) do truly ~~awful~~ magical things with the preprocessor, and `-E` is an invaluable tool for creating ~~such abominations~~ rainbows and sunshine.
+ 
+
+Back to what happenes when we remove the #include-directive: The problem is that the compiler has no way of knowing what the function `printf` looks like. We can help the compiler out by providing this definition ourselves.
+ - [ ] Provide a definition of `printf`:
+   - A function definition looks similar to a function declaration, but without the function body, eg: `return_type function_name(arg1_type, arg2_type);`. Note the semicolon. Giving names to the arguments is optional in a function definition.
+   - The output from clang is helpful enough to give us the return type and argument types. `...` is also a valid argument: It means that the function takes any number of additional arguments, and that their types are unknown.
         
-2: With no #include
-    [!] preprocessor
-        [?] use -E
-    implicit declaration is bad!
-    default function is `int fcn(...)`
-        which printf satisfies (fmt'ing later)
-    [?] Add a forward declaration of printf
+So why did the program compile and run even if the compiler didn't know what `printf` looks like? As it turns out, in C the "default" type of a function (one that is not defined) is `int function(...)`: A function that takes any arguments and returns an integer. Since `printf` happenes to be such a function, this technically "works fine".
+
+
         
 3: With no return value
     [!] language standards: c89, c99 (gnu99), c11
