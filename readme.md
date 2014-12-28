@@ -12,8 +12,8 @@ There are several ways to open a new terminal window:
 
 From the terminal we can much more than with the graphical interface, but we will start with some basic and familiar functions. First, we should make a new folder that we will use as our "workbench" of sorts.
 
- - [ ] To make this folder on the desktop, we must first change directory in the terminal. Do this by typing `cd ~/Desktop` ("cd" means "change directory"). Use the Tab key to autocomplete the directory name.
- - [ ] Make a new directory using `mkdir directoryName`. Give this some appropriate name.
+  - :question: To make this folder on the desktop, we must first change directory in the terminal. Do this by typing `cd ~/Desktop` ("cd" means "change directory"). Use the Tab key to autocomplete the directory name.
+  - :question: Make a new directory using `mkdir directoryName`. Give this some appropriate name.
 
 We can create new files using `touch fileName`, and edit them using - for example - `nano` or `vi`. There are of course other non-terminal text editors, and these may be more (or less) comfortable to work with. Create a file.
 
