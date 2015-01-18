@@ -96,7 +96,7 @@ Note that C use braces (`{``}`) to signify the start and end of a scope, unlike 
    - `printf` is a function, so we need to give the compiler some information about what this function looks like. We find this information in `stdio.h`, which is why we use `#include <stdio.h>`.
 
    
-###2: Basic types
+###2: Primitive (built-in) types
 
 C is a statically typed language, which means that all variables must be assigned a type, and this type cannot change. The built-in types are:
  - `int`: Standard signed integer, usually 32 bit.
@@ -143,24 +143,26 @@ C also has the unary (one-argument) increment and decrement operators:
  - `value++` and `++value` increase `value` by `1`
  - Similarly for `value--` and `--value`
  
- - [ ] Try the post- and pre-increment to see how they behave differently (eg `printf("%d\n", x++);`)
+ - [ ] Try the post- and pre-increment operators to see how they behave differently (eg `printf("%d\n", x++);`)
  
-The binary arithmetic operators can also be combined with assignment (`=`), to avoid writing `value = value + 2`:
+The binary arithmetic operators can also be combined with assignment (`=`). This way, we can re-write `value = value + 2` as `value += 2`, to avoid duplication of the variable name.
  - `+=  -=  *=  /=  %=`
  
-There are also bitwise operators (`~  &  |  ^  <<  >>`) for working with single bits. We will not be using them.
+There are also bitwise operators (`~  &  |  ^  <<  >>`) for working with single bits. We will not be needing them for now.
 
     
 ###5: Functions
-    - [ ] Create a function that takes an integer and returns its square.
-      - The function must be declared "before" it is used, in other words above the point where it is called.
-      - C does not allow you to declare a function inside another function
+
+- [ ] Create a function that takes an integer and returns its square.
+  - The function must be declared "before" it is used, in other words above the point where it is called.
+  - In case you were wondering: C does not allow you to declare a function inside another function.
     
 ###6: Loops
 
 C has several loop statements:
  - `for(initialize; test; increment){}`: Runs `initialize`, then runs `test` *before* and `increment` *after* the loop body.
    - eg `for(int i = 0; i < 10; i++){}` will give `i` the values 0 to 9
+     - (This is equivalent to `for i in range(0, 10):` in Python)
  - `while(condition){}`: Runs the loop body while `condition` is true.
    - Equivalent to `for(; condition; ){}`
    - `while(1){}` will run forever.
@@ -185,18 +187,140 @@ if(condition){
 `else if` and `else` are optional. Any number of `else if`s can be added.
 
  - [ ] Create a function that prints the [Hailstone sequence](http://en.wikipedia.org/wiki/Collatz_conjecture) for positive numbers. The numbers should be printed on a single line, in columns 4 wide, left justify.
-   - Example output for `3`: `3   10  5   16  8   4   2   `
+   - Example output for `3`: <pre><code>3   10  5   16  8   4   2   </code></pre>
      - Use `printf` format specifiers to achieve this.
    - Use modulo (`%`) to check if a value is even or odd.
 
 ###8: User-defined types
-    typedef
-    structs
-    [?] Create a struct
-    [?] write a fake magic trick that modifies the struct content / creates a new struct
-        [!] pointers, addrof (&), indirection/dereference (*)
+
+####Structs
+
+We can create composite types (a type composed of primitive types (and other composite types)) by using the `struct` keyword:
+```C
+struct Type {
+    int     firstMember;
+    float   secondMember;
+};
+```
+
+To create an instance of `Type`, we write:
+```C
+struct Type someInstanceOfType;
+// And to assign values to struct members:
+someInstanceOfType.firstMember = 5;
+```
+
+We can also assign the members all at once:
+```C
+struct Type instanceOne = {5, 3.4};
+// Assigning with a "designated initializer":
+struct Type instanceTwo = {.secondMember = 7.2, .firstMember = 6};
+```
+
+Note that we need to write `struct Type`, and not just `Type`! To avoid this, we can use `typedef` keyword:
+
+#####Typedef
+The only thing `typedef` does is give a new name to a type. This is also useful for giving the compiler some additional help, so that you don't accidentally write `birthday = currentSpeed + numGiraffes`. See [typedef](http://en.wikipedia.org/wiki/Typedef) on Wikipedia.
+
+With typedef, we can shorten declarations of complex types:
+```C
+typedef  struct Foo  Bar;
+// These are now equivalent:
+struct Foo  instance;
+Bar         instance;
+
+// makes `struct tag_type` and `Type` equivalent
+typedef struct tag_type  Type;
+struct tag_type {
+    int     firstMember;
+    float   secondMember;
+};
+
+// This typedef's an anonymous (un-named) struct as `Type`
+typedef struct {
+    int     firstMember;
+    float   secondMember;
+} Type;
+
+
+// And an instance is declared as:
+Type instance;
+```
+
+####Enumerations
+An enumeration is a set of named values, but it is not a new type. The named values are integers, and their values start at 0 (unless something else is assigned), and each new value is 1 larger than the previous:
+```C
+enum Weekday {
+    monday, tuesday, wednesday = 11, thursday, friday
+}
+// monday will have the value 0, friday has the value 13
+```
+Note that we can accidentally write `enum Weekday w = 972;` without the compiler warning us!
+
+To avoid writing `enum`, we can use the same typedef trick as before.
+
+ - [ ] Write a function that performs a magic card trick:
+   - Create an enum that signifies the suit of the card (club, spade, heart, diamond)
+   - Create a struct that has two members: the first is the suit, and the second is the value
+   - Create a function that takes a card, and returns a new card!
+ - [ ] Create a function that does not return a new card, but instead modifies the original card.
+   - Hm, why doesn't it work?
+   
+When we pass a parameter to a function, the value is copied (commonly called "pass-by-value"). So when we pass a struct to a function and modify it, we just modify the copy! To modify the original ("un-copied") value, we need to pass the memory location of the original ("pass-by-reference").
+
+###9: Pointer basics
+
+To get the address (memory location) of a variable, we use the `&` operator:
+```C
+int i = 5;
+printf("Address of i: %p\n", &i);
+```
+
+A pointer (to a a variable of a type) is a variable that can store an address. **A pointer is an [incomplete] type: it must be combined with another type to form a type of its own:**
+```C
+// (continued from above)
+// A "pointer to int" called `addr`
+int * addr = &i;
+// A "pointer to nothing" does not compile, and makes no sense anyway!
+* wut = &i;
+```
+
+Here's the confusing part: The `*` symbol is not just used for declaring pointers, but also for dereferencing a pointer (ie accessing the value stored at that address):
+```C
+// (continued from above)
+// Should print 5
+printf("Value stored at memory location %p: %d\n", addr, *addr);
+
+int j = *addr;
+printf("Value of j: %d\n", j);  // (Also 5)
+```
+
+With pointers, we can pass memory locations as parameters to functions:
+```C
+// Takes the address of an integer as a parameter
+void func(int * j){
+    // Writes the value 7 at the memory location pointed to by j
+    *j = 7;
+}
+int main(void){
+    int i = 6;
+    func(&i);   // Passes the address of i, not i itself
+    printf("Value of i: %d\n", i);  // should print 7
+}
+```
+
+ - [ ] Now we can create a function that performs a magic card trick by modifying the original card (passing the card "by reference").
+   - Make sure you dereference the right thing!
+     - `*foo.bar` means `*(foo.bar)`, not `(*foo).bar`!
+     - We need to dereference the struct, not the members.
+
+####Alternative dereference syntax for structs
+Writing `(*card).value = ...` is rather tedious. There exists an alternative syntax for accessing members of derefernced structs: `card->value`
+ - [ ] Rewrite the pass-by-reference card trick with the more readable `->` syntax.
+ 
     
-9: Fixed-size arrays and basic pointer arithmetic
+###10: Fixed-size arrays and basic pointer arithmetic
+
     [?] write a helper fcn that prints the array
         use array[indexing]
     [?] use sum += *p++ to foldl an array
