@@ -76,7 +76,7 @@ Now that we know how the basics of using the terminal and invoking compilers, we
 This is not a test, and it is not a competition. The goal is to learn the basics of the C language and toolchain so that you can start making useful programs on your own. If you are stuck, you should ask for help. Remember that your fellow students and the internet are also valuable resources!
 
 ###0: Hello world
- - [ ] Copy or type the standard "[hello world](https://github.com/klasbo/Intro-C-linux-dev/blob/master/hello_world.c)" program. Compile it and run it, and verify that it works as expected.
+ - [ ] Copy or type the standard "[hello world](/hello_world.c)" program. Compile it and run it, and verify that it works as expected.
 
 ###1: The `main` function
 
@@ -316,7 +316,7 @@ int main(void){
      - We need to dereference the struct, not the members.
 
 ####Alternative dereference syntax for structs
-Writing `(*card).value = ...` is rather tedious. There exists an alternative syntax for accessing members of derefernced structs: `card->value`
+Writing `(*card).value = ...` is rather tedious. There exists an alternative syntax for accessing members of dereferenced structs: `card->value`
  - [ ] Rewrite the pass-by-reference card trick with the more readable `->` syntax.
  
  
@@ -416,9 +416,39 @@ Since arrays decay to pointers when passed to a function, this must mean that th
 Exercise 3 : Modules and Makefiles
 ==================================
 
-1: {temp} Move some previous exercise to another file
+So far, we have only used one source file at a time. As a project grows in size, it becomes increasingly important to split it into self-contained modules, as it is impossible to keep everything in your head at once. A good module should offer a consistent *abstraction*: We should be able to "know" how if works just by looking at the "outside" of the module, and without knowing anything about how it works on the "inside". One way of forming a module is by simply creating a new file.
 
-2: {temp} Create a makefile (?)
+###A timer module
+
+The module we will be making here is a simple timer, that you can hopefully use in the elevator project. (You are of course free to implement this in whatever way you want, but here are some ideas to get you started)
+
+The timer must be able to:
+ - Be started, with some duration
+ - Be stopped (or reset)
+ - Signal when the duration has passed
+ 
+
+The function [`gettimeofday`](http://linux.die.net/man/2/gettimeofday) is found in `sys/time.h`. It modifies a `timeval` struct, such that it containts the number of seconds and microseconds since the 1st of January 1970. To convert the timeval struct into a double (so that we can more easily do addition and subtraction), we can use the following function:
+
+```C
+double get_wall_time(void){
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    return (double)time.tv_sec + (double)time.tv_usec * .000001;
+}
+```
+(Note that we lose some precision by converting to double, but for our usage it's fine)
+
+The timer module must also have some internal variables, such as the start time, duration, and/or end time, and possibly whether the timer is active or not (which of these do you need?).
+
+####Header (.h) files and implementation (.c) files
+
+functions in h + c
+variables just in c (should not be accessible from the outside: v abstraction)
+
+###Makefiles
+
+Create a makefile that compiles main + module as two objects
     
     
     
