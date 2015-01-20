@@ -257,7 +257,7 @@ enum Weekday {
 ```
 Note that we can accidentally write `enum Weekday w = 972;` without the compiler warning us!
 
-To avoid writing `enum`, we can use the same typedef trick as before.
+To avoid writing `enum Weekday` instead of just `Weekday`, we can use the same typedef trick as before.
 
  - [ ] Write a function that performs a magic card trick:
    - Create an enum that signifies the suit of the card (club, spade, heart, diamond)
@@ -276,10 +276,11 @@ int i = 5;
 printf("Address of i: %p\n", &i);
 ```
 
-A pointer (to a a variable of a type) is a variable that can store an address. **A pointer is an [incomplete] type: it must be combined with another type to form a type of its own:**
+A pointer (to a a variable of a type) is a variable that can store an address. A pointer is not a type, but a *type constructor*: it must be applied to a proper type to form a proper type of its own.
+(Similarly, you cannot have a "list of nothings", but you can have a "list of penguins". A "list" on its own is not a type.)
 ```C
 // (continued from above)
-// A "pointer to int" called `addr`
+// A "pointer to int", called `addr`
 int * addr = &i;
 // A "pointer to nothing" does not compile, and makes no sense anyway!
 * wut = &i;
@@ -317,6 +318,30 @@ int main(void){
 ####Alternative dereference syntax for structs
 Writing `(*card).value = ...` is rather tedious. There exists an alternative syntax for accessing members of derefernced structs: `card->value`
  - [ ] Rewrite the pass-by-reference card trick with the more readable `->` syntax.
+ 
+ 
+####The `switch` statement
+The switch statement is very similar to a set of if-else-statements, but with one major difference: You can only switch on a single value (unlike a chain of if-statements, which can contain anything). This means that a switch-statement can often more clearly express the intent of the code.
+```C
+switch(value){
+case 1:
+    printf("The value is 1\n");
+    break;
+case 2:
+    printf("The value is 2\n");
+    // No `break` here: case 2 will "fallthrough" to the next case.
+    //  (this is a common source of bugs)
+case 3:
+    printf("The value is 2 or 3\n");
+    break;
+default:
+    printf("The value is something else\n");
+}
+```
+
+ - [ ] Write a function that returns a string (`char *`) that gives a readable name of the card suit enum.
+   - Use a switch-statement, with a case for each member in the enum.
+   - Note: If you have a return statement inside a case, any code after it (such as a `break` label) will be unreachable.
  
     
 ###10: Fixed-size arrays and basic pointer arithmetic
