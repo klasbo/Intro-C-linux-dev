@@ -345,12 +345,72 @@ default:
  
     
 ###10: Fixed-size arrays and basic pointer arithmetic
+C does not have any dynamically sized arrays (arrays that change the length of at runtime)! Any programming language that has dynamic arrays is hiding a lot of bookkeeping behind the scenes. To create our own dynamic arrays, we'll have to either create our own, or find some code someone else has written. So for now, we will only look at fixed-size arrays.
 
-    [?] write a helper fcn that prints the array
-        use array[indexing]
-    [?] use sum += *p++ to foldl an array
-    [?] call sort to sort an array
-        [!] memory layout, object sizes, higher-order functions
+In C, it is said that "declaration reflects use". As we saw with pointers, they were used as `*p = &var;`, so therefore they are declared  as `int *p;` (if we remove one of the spaces). Similarly with arrays: They are used as `arr[3] = 5;`, so they are declared as `int arr[8];`.
+
+```C
+// Declares an array of 8 integers
+//  Note that the array is currently uninitialized! It will contain junk
+int arr1[8]; 
+
+// Arrays are 0-indexed
+printf("The first element: arr1[%d]: %d (should be junk)\n", 0, arr[0]);
+
+// Declares an array of 6 integers, where the first 3 elements are 4, 2 and 7
+//  The remaining elements will be set to 0
+int arr2[6] = {4, 2, 7};
+printf("arr2[%d]: %d (should be 4)\n", 0, arr[0]);
+printf("arr2[%d]: %d (should be 7)\n", 2, arr[2]);
+printf("arr2[%d]: %d (should be 0)\n", 3, arr[3]);
+
+// We can therefore initialize an entire array to 0 by writing
+int arr3[8] = {0};
+
+// The compiler can deduce the length of the array if we initialize it
+//  But it is not dynamically sized! The compiler just fills in the missing `5` in the square brackets
+int arr4[] = {6, 5, 2, 3, 0};
+```
+
+####Memory layout of arrays
+Arrays are just a contiguous block of memory. If we were to access an array "out-of-bounds" (either negative indexes, or indexes larger than the length of the array), then we would just access whatever happened to be there. Probably. This is what is known as "undefined behaviour", a world where [literally anything](http://c-faq.com/ansi/undef.html) is allowed to happen.
+
+```C
+int main(){
+    int j = 44;
+    int i = 3;
+    int arr[2] = {10, 20};
+    printf("arr[i]: %d (probably 44)\n", arr[i]);
+    // (Note that the memory order is reversed)
+}
+```
+
+If we were to write a function that can work on arrays of any length, then that function needs to know how long the array is. One way of solving this would be to store the length of the array as part of the type (as if creating a struct behind the scenes), but the C philosophy does not approve of this kind of overhead. In fact, the C philosophy approves *so little* of any kind of overhead, it doesn't even send the array to the function! It just sends a pointer to the first element of the array!
+
+```C
+// These two are literally completely equivalent!
+void foo(int arr[]){
+    // ...
+}
+void foo(int * arr){
+    //...
+}
+```
+
+All this means that if we want a function that takes arrays as parameters, we must send the location of the first element of the array (an array "decays" into a pointer all by itself when we pass it to a function), as well as the length of the array.
+
+ - [ ] Write a function that prints an integer array
+   - It must take two parameters: `int arr[]` (or `int *arr`), and the length of the array
+   - Use a loop to iterate upward to the length of the array
+
+Since arrays decay to pointers when passed to a function, this must mean that the array indexing syntax `arr[index]` is actually working with pointers! In fact, `arr[index]` and `*(arr+index)` are completely equivalent!
+
+ - [ ] Write a function that finds the sum of the elements in an array of function
+   - But do not use the `[]` syntax! Use raw pointers instead.
+   
+
+    [?] call qsort to sort an array
+        [!] casts, object sizes, higher-order functions
     
 
 Exercise 3 : Modules and Makefiles
@@ -362,8 +422,8 @@ Exercise 3 : Modules and Makefiles
     
     
     
-Part 6: Goodbye World (Advanced/For fun/Optional)
--------------------------------------------------
+Part 6: Goodbye World (Advanced/For fun)
+----------------------------------------
 
 We will be doing something rather unconventional here: By looking at each little piece in the standard "hello world" program in detail, and then removing that piece, we will break down (in more ways than one) a C program and the toolchain used for building an executable.
 

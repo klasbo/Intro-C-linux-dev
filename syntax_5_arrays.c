@@ -64,10 +64,12 @@ int main(){
     // The compiler can also deduce the array size from the initializer list:
     int arr2[] = {1, 5, 3, 0, 7, 3};
     
-    // But after compiling, the size information is lost.
-    // We need to pass the size of the array wherever we use it
-    // If the size is wrong, Bad Things can happen.
-    //  Try giving printArray a size that is too large! Also, compile with -fsanitize=address
+    // But we cannot access the size of the array when we pass it to a 
+    //   function that can take arrays of any size
+    // So we need to pass the size of the array wherever we use it
+    // If the size is wrong, Bad Things can happen
+    //  Try giving printArray a size that is too large!
+    //    Also, compile with -fsanitize=address
     printArray(arr2, 3);
     
     // Fortunately, we can access compile-time constants like so:
