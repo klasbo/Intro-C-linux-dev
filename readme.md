@@ -156,7 +156,33 @@ There are also bitwise operators (`~  &  |  ^  <<  >>`) for working with single 
 - [ ] Create a function that takes an integer and returns its square.
   - The function must be declared "before" it is used, in other words above the point where it is called.
   - In case you were wondering: C does not allow you to declare a function inside another function.
+  
+Functions cannot be forward referenced. To call a function not yet encountered in the source file, it is necessary to insert a function declaration preceding the call. A function declaration looks similar to a function definition, but without the function body, eg: `return_type function_name(arg1_type, arg2_type);`. Giving names to the arguments is optional in a function definition.
+
+```C
+// Incorrect (compile with `-Wall`):
+int main(void){
+    foo(17);
+}
+void foo(int i){
+    // ...
+}
+
+// Correct: 
+void foo(int i); // Giving the parameter a name (here `i`) is optional
+int main(void){
+    foo(17);
+}
+void foo(int i){
+    // ...
+}
+```
     
+ - [ ] Move the square-function below the main function
+   - Verify that you get a warning about an "implicit declaration"
+   - Create a function declaration above the main function
+   
+
 ###6: Loops
 
 C has several loop statements:
@@ -259,14 +285,44 @@ Note that we can accidentally write `enum Weekday w = 972;` without the compiler
 
 To avoid writing `enum Weekday` instead of just `Weekday`, we can use the same typedef trick as before.
 
- - [ ] Write a function that performs a magic card trick:
-   - Create an enum that signifies the suit of the card (club, spade, heart, diamond)
+#####The `switch` statement
+Since enums are just a collection of integer constants, printing enums would just print this constant, and not the name. we will create a function that prints the name of each constant by using the `switch` statement.
+
+The switch statement is very similar to a set of if-else-statements, but with one major difference: You can only switch on a single value (unlike a chain of if-statements, which can contain anything). This means that a switch-statement can often more clearly express the intent of the code.
+```C
+switch(value){
+case 1:
+    printf("The value is 1\n");
+    break;
+case 2:
+    printf("The value is 2\n");
+    // No `break` here: case 2 will "fallthrough" to the next case.
+    //  (this is a common source of bugs)
+case 3:
+    printf("The value is 2 or 3\n");
+    break;
+default:
+    printf("The value is something else\n");
+}
+```
+
+####A card trick
+
+ - [ ] Create an enum that signifies the suit of the card (club, spade, heart, diamond)
+ - [ ] Write a function that returns a string (`char *`) that gives a readable name of the card suit enum.
+   - Use a switch-statement, with a case for each member in the enum.
+   - Note: If you have a return statement inside a case, any code after it (such as a `break` label) will be unreachable.
+ 
+ - [ ] Write a function that performs a magic card trick:   
    - Create a struct that has two members: the first is the suit, and the second is the value
    - Create a function that takes a card, and returns a new card!
+   
  - [ ] Create a function that does not return a new card, but instead modifies the original card.
    - Hm, why doesn't it work?
    
 When we pass a parameter to a function, the value is copied (commonly called "pass-by-value"). So when we pass a struct to a function and modify it, we just modify the copy! To modify the original ("un-copied") value, we need to pass the memory location of the original ("pass-by-reference").
+
+
 
 ###9: Pointer basics
 
@@ -320,29 +376,7 @@ Writing `(*card).value = ...` is rather tedious. There exists an alternative syn
  - [ ] Rewrite the pass-by-reference card trick with the more readable `->` syntax.
  
  
-####The `switch` statement
-The switch statement is very similar to a set of if-else-statements, but with one major difference: You can only switch on a single value (unlike a chain of if-statements, which can contain anything). This means that a switch-statement can often more clearly express the intent of the code.
-```C
-switch(value){
-case 1:
-    printf("The value is 1\n");
-    break;
-case 2:
-    printf("The value is 2\n");
-    // No `break` here: case 2 will "fallthrough" to the next case.
-    //  (this is a common source of bugs)
-case 3:
-    printf("The value is 2 or 3\n");
-    break;
-default:
-    printf("The value is something else\n");
-}
-```
 
- - [ ] Write a function that returns a string (`char *`) that gives a readable name of the card suit enum.
-   - Use a switch-statement, with a case for each member in the enum.
-   - Note: If you have a return statement inside a case, any code after it (such as a `break` label) will be unreachable.
- 
     
 ###10: Fixed-size arrays and basic pointer arithmetic
 C does not have any dynamically sized arrays (arrays that change the length of at runtime)! Any programming language that has dynamic arrays is hiding a lot of bookkeeping behind the scenes. To create our own dynamic arrays, we'll have to either create our own, or find some code someone else has written. So for now, we will only look at fixed-size arrays.
@@ -395,28 +429,38 @@ void foo(int arr[]){
 void foo(int * arr){
     //...
 }
+
+
+int arr[8] = {0};
+// When calling `foo`, these are also equivalent!
+foo(arr);       // The array decays to a pointer automatically
+foo(&arr[0]);   // We pass the address of the first element in the array
+
 ```
+
 
 All this means that if we want a function that takes arrays as parameters, we must send the location of the first element of the array (an array "decays" into a pointer all by itself when we pass it to a function), as well as the length of the array.
 
  - [ ] Write a function that prints an integer array
    - It must take two parameters: `int arr[]` (or `int *arr`), and the length of the array
-   - Use a loop to iterate upward to the length of the array
+   - Use a loop to iterate over the array, by using a variable for the index
+ - [ ] Try passing the wrong length to the array (especially lengths too long)
+   - Try compiling with `-g -fsanitize=address`, and try again. Does it tell you what and where the problem is?
+     - Using AddressSanitizer is very useful for catching these kinds of subtle bugs!
 
+   
 Since arrays decay to pointers when passed to a function, this must mean that the array indexing syntax `arr[index]` is actually working with pointers! In fact, `arr[index]` and `*(arr+index)` are completely equivalent!
 
  - [ ] Write a function that finds the sum of the elements in an array of function
-   - But do not use the `[]` syntax! Use raw pointers instead.
+   - But do not use the `[]` syntax! Use raw pointers instead
+   - You can also increment and decrement pointers with `ptr++` and `ptr--` to advance forward or backward in the array
    
-
-    [?] call qsort to sort an array
-        [!] casts, object sizes, higher-order functions
     
 
-Exercise 3 : Modules and Makefiles
-==================================
+Modules and Makefiles
+=====================
 
-So far, we have only used one source file at a time. As a project grows in size, it becomes increasingly important to split it into self-contained modules, as it is impossible to keep everything in your head at once. A good module should offer a consistent *abstraction*: We should be able to "know" how if works just by looking at the "outside" of the module, and without knowing anything about how it works on the "inside". One way of forming a module is by simply creating a new file.
+So far, we have only used one source file at a time. As a project grows in size, it becomes increasingly important to split it into self-contained modules, as it is impossible to keep everything in your head at once. A good module should offer a consistent *abstraction*: We should be able to grasp how it works just by looking at the "outside" of the module, and without knowing anything about how it works on the "inside" (Eg: we understand what `printf` does without knowing how it does it). One way of forming a module is by creating a new file.
 
 ###A timer module
 
@@ -428,7 +472,7 @@ The timer must be able to:
  - Signal when the duration has passed
  
 
-The function [`gettimeofday`](http://linux.die.net/man/2/gettimeofday) is found in `sys/time.h`. It modifies a `timeval` struct, such that it containts the number of seconds and microseconds since the 1st of January 1970. To convert the timeval struct into a double (so that we can more easily do addition and subtraction), we can use the following function:
+The function [`gettimeofday`](http://linux.die.net/man/2/gettimeofday) is found in `sys/time.h`. It modifies a `timeval` struct, such that it contains the number of seconds and microseconds since the 1st of January 1970. To convert the timeval struct into a double (so that we can more easily do addition and subtraction), we can use the following function:
 
 ```C
 double get_wall_time(void){
@@ -439,21 +483,90 @@ double get_wall_time(void){
 ```
 (Note that we lose some precision by converting to double, but for our usage it's fine)
 
-The timer module must also have some internal variables, such as the start time, duration, and/or end time, and possibly whether the timer is active or not (which of these do you need?).
+The timer module must also have some internal variables, such as the start time, duration, and/or end time, and possibly whether the timer is active or not (which of these do you need?). These internal variables should not be accessible from the outside: They should only be modified by the functions in the interface (start/stop/reset/peek/hasTimedOut/etc). To achieve this, we will put the timer code in its own file.
 
 ####Header (.h) files and implementation (.c) files
 
-functions in h + c
-variables just in c (should not be accessible from the outside: v abstraction)
+There is no functional difference between header files and implementation files, but the convention is that the definitions (the actual code) goes in the .c file, while the declarations go in the .h file. Any code that needs to call functions from another file would then only include the .h file.
+
+To compile multiple files at the same time, we can either pass all the files together (eg `clang -Wall file1.c file2.c`), or use a makefile (see below).
+
+ - [ ] Create the timer module, with a .h and a .c file with the same name (eg timer.h and timer.c)
+   - Only put the function declarations in the header file
+   - Put the function definitions (implementations) and local variables in the .c file
+ - [ ] Test the module from the file that has your `main()` function
+   - Include the .h file, not the .c file
+   - To check that the duration is correct, call the program with `time ./program` from the command line, and look at the `real` time used
+
 
 ###Makefiles
 
-Create a makefile that compiles main + module as two objects
+Compile times will grow with the number of lines of code. If we can compile the files individually (and then link them together), we only need to compile the one we made changes to, thus saving on compile time. Also, back in 1972 there often wasn't enough memory installed in the system to compile everything at the same time anyway!
+
+The program `make` lets us automate this process, by looking at the timestamps of the dependencies: The executable file depends on the source code, so if the source code is newer than the executable, it must be rebuilt. We will separate the dependencies into two phases:
+
+ - The executable depends on the object (.o) files
+   - It is created by linking together the object files
+ - The object files depend on the corresponding .c files
+   - They are created by compiling the .c files with `-c`
+
+A makefile is based on rules, which are used to decide what happens when the target timestamp is older than the dependency. Rules are structured like this:
+   
+```Makefile
+# The basic rule:
+target: dependency1 dependency2
+	command1
+	command2
+# Note: The indentation above must use a single tab, not spaces!
+    
+# Example:
+timer.o: timer.c
+	clang -c timer.c
+    
+# When using the same rule for several targets
+targets: target-pattern: dependency-pattern
+	command
+```
+
+ - Creating variables:
+   - `SOURCES = main.c timer.c`
+   - `EXECUTABLE = someProgramName`
+ - Accessing variables:
+   - `$(TARGET)`
+ - Substituting:
+   - `OBJECTS = $(SOURCES:.c=.o)` (sets `OBJECTS` to `main.o timer.o`)
+ - Pattern matching:
+   - `$(OBJECTS): %.o: %.c`
+ - Automatic variables:
+   - `$@`: The target of the rule
+   - `$^`: All the dependencies
+   - `$<`: Only the first dependency
+   
+With these, we can now create a simple makefile.
+
+ - [ ] Create a file called `makefile` (or `Makefile`). (It has no file extension)
+ - [ ] Create all the variables we need:
+   - The name of the executable (just pick something)
+   - The list of all the source files
+   - The list of all the corresponding object files (use substitution!)
+   - The list of all the compiler flags (eg `-Wall`, `-g`, etc)
+   - The name of compiler to use (`clang` or `gcc`)
+ - [ ] Create a rule for compiling object files
+   - Use pattern matching, since the rule for all the object files are the same
+   - Use the automatic variable `$<` to reference the name of the dependency (ie the .c file)
+   - Remember to use the extra flag `-c`
+   - Remember also to include the list of compiler flags
+ - [ ] Create a rule for linking the executable
+   - You can use the compiler to link object files (ie `clang obj1.o obj2.o`)
+   - Use the automatic variable `$^` to get the list of the dependencies (the object files)
+   - Use the automatic variable `$@` to get the name of the target (the executable name)
+     - Use the flag `-o` to set the name of the output executable
+   - Makefiles are read from the top down, so put this rule *above* the rule for creating the object files
+ - [ ] Invoke the makefile by calling `make` from the command line
     
     
-    
-Part 6: Goodbye World (Advanced/For fun)
-----------------------------------------
+Goodbye World (Advanced/For fun)
+================================
 
 We will be doing something rather unconventional here: By looking at each little piece in the standard "hello world" program in detail, and then removing that piece, we will break down (in more ways than one) a C program and the toolchain used for building an executable.
 
@@ -476,8 +589,7 @@ To see what our source code looks like after the preprocessor has done its work,
  
 
 Back to what happens when we remove the #include-directive: The problem is that the compiler has no way of knowing what the function `printf` looks like. We can help the compiler out by providing this definition ourselves.
- - [ ] Provide a definition of `printf`:
-   - A function definition looks similar to a function declaration, but without the function body, eg: `return_type function_name(arg1_type, arg2_type);`. Note the semicolon. Giving names to the arguments is optional in a function definition.
+ - [ ] Provide a definition of `printf`
    - The output from clang is helpful enough to give us the return type and argument types. `...` is also a valid argument: It means that the function takes any number of *additional* arguments, and that their types are unknown.
         
 So why did the program compile and run even if the compiler didn't know what `printf` looks like? As it turns out, in C the "default" type of a function (one that is not defined) is `int function()`: A function that takes any number of arguments and returns an integer. Since `printf` happens to be such a function, this technically "works fine".
@@ -492,15 +604,13 @@ C is an old language, and so there exists several standards: c89, c99, and the m
    - Do you see any place in the code that corresponds to the return value of the program?
    - Hint (Spoilers): Try modifying the printed message to something else, like "Penguins!".
 
-[Explanation of stack from Sverre?]
-[Trailing zeros in strings from Sverre?]
 
 ###4: The smallest C program?
 
 Let's keep removing things! The first to go is `printf`.
 
 Remember the "default" function type? This also goes for `main`: It takes an unknown number of arguments, and returns an integer. This means we can remove the `void` argument, and also the return type.
- - [ ] Compile this "program" and run it. Wasn't that exciting?
+ - [ ] Compile this "program" (there's no code inside `main` any more...) and run it. Wasn't that exciting?
 
 ###5: Definitely the smallest C program.
 
@@ -516,6 +626,36 @@ So to create an executable without `main`, we need to prevent *the C compiler* f
  - [ ] Invoke the linker with `ld`, and pass the object file. You can give a name to the executable using `-o` as before.
  - [ ] Run the worlds shortest C program!
  
-As an added bonus, this is also the shortest program that produces its own source code as output...
+As an added bonus, this is also the shortest program that produces its own source code as its output...
 
 The words "Segmentation Fault" means that the operating system prevented you from accessing memory that your program doesn't own. In this case, the value of `_start` was not defined, so `ld` gave it a default value, one that happened to be outside the valid memory region of the program. Without an operating system, this program would have interpreted whatever happened to lie in this memory as valid machine code, and all hell would break loose.
+
+
+Appendix
+========
+
+###The `null` pointer
+Todo
+ - the billion dollar mistake
+ - if(ptr)
+ 
+###Pointer casting
+Todo
+ - reinterpret cast: `*(T*)&v`
+
+###Function pointers
+Todo
+ - function types
+ 
+
+###Higher-order functions
+Todo
+####Example: `qsort`
+
+###Floating-point is hard
+Todo
+ - digital representation of analog concept -> reduced presicion
+ - `recurrence!("108-(815-1500/a[n-2])/a[n-1]")(4.0, 4.25)`
+ - foldl1 (+) (replicate 10 0.1)  !=  0.1 * 10
+ 
+ 
