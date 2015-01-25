@@ -4,11 +4,11 @@
 
 
 void printArray(int arr[], int sz){
-    printf("[%d", arr[0]);
+    printf("{%d", arr[0]);
     for(int i = 1; i < sz; i++){
         printf(", %d", arr[i]);
     }
-    printf("]\n");
+    printf("}\n");
 }
 
 
@@ -72,9 +72,11 @@ int main(){
     //    Also, compile with -fsanitize=address
     printArray(arr2, 3);
     
-    // Fortunately, we can access compile-time constants like so:
-    //  sizeof(arr2) gives the total memory usage of the array
-    //  sizeof(arr2[0]) gives the memory usage of a single element
+    // If the size of the array is known at compile-time, we can get the size 
+    //   of the array (in bytes) using sizeof(), as long as we are in the same 
+    //   scope the array was declared in. sizeof() only works at compile-time.
+    // sizeof(arr2) gives the total memory usage of the array
+    // sizeof(arr2[0]) gives the memory usage of a single element
     printArray(arr2, sizeof(arr2)/sizeof(arr2[0]));
     
     // To make this easier, we define this function-like macro:
