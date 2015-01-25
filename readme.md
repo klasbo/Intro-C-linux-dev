@@ -1,3 +1,57 @@
+
+Preface
+=======
+
+This text is intended to be a resource to prepare you for working on the elevator project. It covers a lot of ground, and is not intended to be completed in only four hours. The entire exercise is voluntary, so feel free to skip ahead, or come back to this text after you have started with the actual project work.
+
+###Contents:
+
+- [Intro to C and Linux](#intro-to-c-and-linux)
+  - [Part 1: Your terminal and you](#part-1-your-terminal-and-you)
+    - [Opening a terminal window](#opening-a-terminal-window)
+  - [Part 2: Ready, set, C](#part-2-ready-set-c)
+    - [Compilers for C](#compilers-for-c)
+    - [Running programs](#running-programs)
+    - [Stopping programs](#stopping-programs)
+  - [Part 3: C syntax and some simple programs](#part-3-c-syntax-and-some-simple-programs)
+    - [0: Hello world](#0-hello-world)
+    - [1: The `main` function](#1-the-main-function)
+    - [2: Primitive (built-in) types](#2-primitive-built-in-types)
+    - [3: `printf`](#3-printf)
+    - [4: Operators](#4-operators)
+    - [5: Functions](#5-functions)
+    - [6: Loops](#6-loops)
+    - [7: If, modulo and `printf` formatting](#7-if-modulo-and-printf-formatting)
+    - [8: User-defined types](#8-user-defined-types)
+      - [Structs](#structs)
+        - [Typedef](#typedef)
+      - [Enumerations](#enumerations)
+        - [The `switch` statement](#the-switch-statement)
+      - [A card trick](#a-card-trick)
+    - [9: Pointer basics](#9-pointer-basics)
+      - [Alternative dereference syntax for structs](#alternative-dereference-syntax-for-structs)
+    - [10: Fixed-size arrays and basic pointer arithmetic](#10-fixed-size-arrays-and-basic-pointer-arithmetic)
+      - [Memory layout of arrays](#memory-layout-of-arrays)
+      - [A note about strings](#a-note-about-strings)
+- [Modules and Makefiles](#modules-and-makefiles)
+    - [A timer module](#a-timer-module)
+      - [Header (.h) files and implementation (.c) files](#header-h-files-and-implementation-c-files)
+    - [Makefiles](#makefiles)
+- [Goodbye World (Advanced/For fun)](#goodbye-world-advancedfor-fun)
+    - [1: The standard "hello world" program](#1-the-standard-hello-world-program)
+    - [2: Without #include](#2-without-#include)
+    - [3: With no return value](#3-with-no-return-value)
+    - [4: The smallest C program?](#4-the-smallest-c-program)
+    - [5: Definitely the smallest C program.](#5-definitely-the-smallest-c-program)
+- [Appendix](#appendix)
+    - [The `null` pointer](#the-null-pointer)
+    - [Pointer casting](#pointer-casting)
+    - [Function pointers](#function-pointers)
+    - [Higher-order functions](#higher-order-functions)
+      - [Example: `qsort`](#example-qsort)
+    - [Floating-point is hard](#floating-point-is-hard)
+    - [`clang-format`](#clang-format)
+
 Intro to C and Linux
 ====================
 
@@ -86,7 +140,7 @@ return_type function_name(argument_type argument_name){
     // function body
 }
 ```
-Note that C use braces (`{``}`) to signify the start and end of a scope, unlike - say - Python, which uses colon (`:`) and significant whitespace (indentation). **Familiar with scope concept?**
+Note that C use braces (`{``}`) to signify the start and end of a scope, unlike - say - Python, which uses colon (`:`) and significant whitespace (indentation). The indentation in C does not matter, but it definitely helps in keeping code more readable.
 
  - The `main` function is where execution starts.
    - `main` must return an `int` (integer). Returning `0` is commonly used to signify that the program has run successfully.
@@ -109,7 +163,6 @@ Notice the lack of booleans and strings.
  - `int` is usually used as a substitute for booleans.
  - `char *` ("pointer to char" (think "memory location of char")) is used for strings. We will come back to how this works later.
 
-**Modifiers? `extern, static, const, unsigned`**
     
 ###3: `printf`
 
@@ -125,8 +178,6 @@ You can find full documentation of printf by typing `man fprintf` in the termina
  - [ ] Try removing the initialization (where you assign a value to the variable), and print the values now.
 
 ###4: Operators
-
-**From Sverre? Resources on the web?**
 
 C uses these symbols for binary (two-argument) arithmetic operators:
  - `*` (multiply), `/` (divide), `%` (modulo)
@@ -381,7 +432,7 @@ Writing `(*card).value = ...` is rather tedious. There exists an alternative syn
 ###10: Fixed-size arrays and basic pointer arithmetic
 C does not have any dynamically sized arrays (arrays that change the length of at runtime)! Any programming language that has dynamic arrays is hiding a lot of bookkeeping behind the scenes. To create our own dynamic arrays, we'll have to either create our own, or find some code someone else has written. So for now, we will only look at fixed-size arrays.
 
-In C, it is said that "declaration reflects use". As we saw with pointers, they were used as `*p = &var;`, so therefore they are declared  as `int *p;` (if we remove one of the spaces). Similarly with arrays: They are used as `arr[3] = 5;`, so they are declared as `int arr[8];`.
+In C, it is said that "declaration reflects use". As we saw with pointers, they were used as `*p = val;`, so therefore they are declared  as `int *p;` (if we remove one of the spaces). Similarly with arrays: They are used as `arr[3] = 5;`, so they are declared as `int arr[8];`.
 
 ```C
 // Declares an array of 8 integers
@@ -455,6 +506,10 @@ Since arrays decay to pointers when passed to a function, this must mean that th
    - But do not use the `[]` syntax! Use raw pointers instead
    - You can also increment and decrement pointers with `ptr++` and `ptr--` to advance forward or backward in the array
    
+    
+####A note about strings
+
+When we write the string literal `"abc"`, this actually places the values `{97, 98, 99, 0}` in read-only memory (`97` is the ascii value for `a`). The string literal does not have a length, but it is terminated with a single `0`. This way we can refer to it with a single pointer (the memory location of the first character), and the string ends when we encounter the first `0`.
     
 
 Modules and Makefiles
@@ -657,5 +712,7 @@ Todo
  - digital representation of analog concept -> reduced presicion
  - `recurrence!("108-(815-1500/a[n-2])/a[n-1]")(4.0, 4.25)`
  - foldl1 (+) (replicate 10 0.1)  !=  0.1 * 10
+ 
+###`clang-format`
  
  
